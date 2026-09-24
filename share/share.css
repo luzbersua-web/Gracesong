@@ -1,0 +1,57 @@
+.sh-hero{background:var(--navy);color:#fff;text-align:center;padding:40px 16px 36px}
+.sh-hero h1{font-family:var(--serif);font-size:29px;line-height:1.25;max-width:620px;margin:0 auto 12px}
+.sh-hero h1 em{color:var(--gold-light);font-weight:500}
+.sh-hero p{color:#D5DCE8;font-size:16px;line-height:1.5;max-width:520px;margin:0 auto}
+
+.rewards{display:grid;gap:12px;margin-bottom:10px}
+.reward{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--paper);border:1px solid var(--border);border-radius:14px;padding:16px}
+.reward.featured{border:2px solid var(--gold);background:#FFFBF0}
+.reward-ico{font-size:28px}
+.reward b{color:var(--navy);font-size:15.5px;display:block;margin-bottom:2px}
+.reward p{font-size:13.5px;color:var(--muted);line-height:1.4}
+.reward-gift{text-align:center;font-family:var(--serif);font-weight:700;color:var(--gold-dark);font-size:17px;line-height:1.15}
+.reward-gift small{font-family:var(--sans);font-weight:500;font-size:11.5px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted);text-align:center;line-height:1.5;margin:6px 0 22px}
+
+.tips{background:var(--alt);border-radius:12px;padding:14px 16px;margin-bottom:26px;font-size:14px}
+.tips b{color:var(--navy)}
+.tips ul{margin:8px 0 0 18px;color:var(--muted);line-height:1.7}
+
+.form .block{margin-bottom:18px}
+.form .label{display:block;font-size:14px;font-weight:600;color:var(--navy);margin-bottom:7px}
+.form .opt{font-weight:400;color:var(--muted);font-size:13px}
+.form input[type=text],.form input[type=email],.form textarea{width:100%;padding:13px 14px;font-size:16px;font-family:var(--sans);border:1.5px solid var(--border);border-radius:10px;background:var(--paper)}
+.form input:focus,.form textarea:focus{outline:none;border-color:var(--gold)}
+.form textarea{min-height:130px;resize:vertical;line-height:1.5}
+.form .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field-err{border-color:#B23B3B!important}
+
+.stars{display:flex;gap:4px}
+.stars button{background:none;border:none;font-size:34px;line-height:1;color:#DDD3BE;cursor:pointer;padding:2px}
+.stars button.on{color:var(--gold)}
+
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px dashed var(--gold);border-radius:14px;background:#FFFBF0;padding:24px 16px;text-align:center;cursor:pointer}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.drop.has{border-style:solid;background:#EEF5F0;border-color:#8CC3A5}
+.drop-ico{font-size:30px}
+.drop-t{font-weight:600;color:var(--navy);font-size:15px;word-break:break-all}
+.drop-d{font-size:12.5px;color:var(--muted)}
+
+.consents{display:grid;gap:10px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;cursor:pointer}
+.check input{width:19px;height:19px;margin-top:1px;accent-color:var(--navy);flex-shrink:0}
+.check[hidden]{display:none}
+
+.err-msg{color:#B23B3B;font-size:14px;margin-bottom:12px}
+.fine{font-size:12.5px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.5}
+.fine a{color:var(--muted)}
+button.btn-main{border:none;cursor:pointer;font-family:var(--sans)}
+button.btn-main:disabled{opacity:.6;cursor:wait}
+
+.done{text-align:center;padding:24px 8px}
+.done-ico{font-size:44px}
+.done h2{margin:10px 0}
+.done p{color:var(--muted);line-height:1.55}
+
+@media (max-width:420px){.form .two{grid-template-columns:1fr}.sh-hero h1{font-size:25px}}
+.check a{color:var(--gold-dark)}

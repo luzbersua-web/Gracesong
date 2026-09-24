@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share Their Reaction — GraceSong</title>
+<meta name="description" content="Share your GraceSong story or your loved one's reaction video and receive a thank-you gift.">
+<link rel="icon" href="../assets/logo-160.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../landing.css">
+<link rel="stylesheet" href="share.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="../"><img src="../assets/logo-160.png" alt="" width="34" height="34"><span>Grace<b>Song</b></span></a>
+  <a class="nav-cta" href="../create/">Create a song</a>
+</nav>
+
+<header class="sh-hero">
+  <div class="eyebrow">Thank you for trusting us</div>
+  <h1>Share the moment they heard their song — <em>and get a gift from us.</em></h1>
+  <p>Your story helps other families find the right words for the people they love.</p>
+</header>
+
+<section class="sec">
+  <div class="wrap narrow">
+    <div class="rewards">
+      <div class="reward">
+        <div class="reward-ico">✍️</div>
+        <div><b>Tell us about your experience</b><p>Write a few lines about your GraceSong.</p></div>
+        <div class="reward-gift">20% off<br><small>your next song</small></div>
+      </div>
+      <div class="reward featured">
+        <div class="reward-ico">🎥</div>
+        <div><b>Send us their reaction video</b><p>The moment they heard it for the first time — tears, smiles, hugs.</p></div>
+        <div class="reward-gift">A free<br><small>GraceSong</small></div>
+      </div>
+    </div>
+    <p class="note">Your gift is sent once we receive your submission — whatever you honestly think of your song. We just ask that it's real.</p>
+
+    <div class="tips">
+      <b>📱 Tips for a beautiful reaction video</b>
+      <ul>
+        <li>Film vertically, from the first notes of the song</li>
+        <li>Keep their face in view — and the room quiet</li>
+        <li>Don't tell them what it is. Just press play.</li>
+      </ul>
+    </div>
+
+    <form id="share-form" class="form" novalidate>
+      <div class="block">
+        <label class="label" for="s-email">Email you used for your order</label>
+        <input type="email" id="s-email" name="email" autocomplete="email" inputmode="email" required placeholder="you@example.com">
+      </div>
+      <div class="block two">
+        <div>
+          <label class="label" for="s-name">Your first name</label>
+          <input type="text" id="s-name" name="name" autocomplete="given-name" maxlength="40" required>
+        </div>
+        <div>
+          <label class="label" for="s-city">City / State <span class="opt">(optional)</span></label>
+          <input type="text" id="s-city" name="city" maxlength="60" placeholder="e.g. Austin, TX">
+        </div>
+      </div>
+
+      <div class="block">
+        <span class="label">How would you rate your GraceSong?</span>
+        <div class="stars" id="stars" role="radiogroup" aria-label="Rating">
+          <button type="button" data-v="1" aria-label="1 star">★</button><button type="button" data-v="2" aria-label="2 stars">★</button><button type="button" data-v="3" aria-label="3 stars">★</button><button type="button" data-v="4" aria-label="4 stars">★</button><button type="button" data-v="5" aria-label="5 stars">★</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <label class="label" for="s-story">Tell us about your experience</label>
+        <textarea id="s-story" name="story" maxlength="1500" required placeholder="Who was the song for? How did they react? How did it make you feel?"></textarea>
+      </div>
+
+      <div class="block">
+        <span class="label">Reaction video <span class="opt">(optional — for the free song)</span></span>
+        <label class="drop" id="drop">
+          <input type="file" id="s-video" name="video" accept="video/*">
+          <span class="drop-ico">🎥</span>
+          <span class="drop-t" id="drop-t">Tap to choose a video</span>
+          <span class="drop-d">MP4 or MOV · up to 500 MB</span>
+        </label>
+      </div>
+
+      <div class="block consents">
+        <label class="check"><input type="checkbox" id="c-use" required>
+          <span>I allow GraceSong to share my review<span id="c-video-txt" hidden> and video</span> on its website, social media and ads, with my first name and city (<a href="../terms.html#rewards" target="_blank">terms</a>).</span></label>
+        <label class="check" id="c-people-row" hidden><input type="checkbox" id="c-people">
+          <span>Everyone who appears in the video agreed to be filmed and shared.</span></label>
+      </div>
+
+      <p class="err-msg" id="s-err" hidden></p>
+      <button type="submit" class="btn-main full" id="s-submit">Send my story</button>
+      <p class="fine">We'll email your gift code within 48 hours. You can ask us to remove your review or video at any time: <a href="mailto:gracesongofficial@gmail.com">gracesongofficial@gmail.com</a></p>
+    </form>
+
+    <div class="done" id="done" hidden>
+      <div class="done-ico">💛</div>
+      <h2>Thank you!</h2>
+      <p id="done-t"></p>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <p class="foot-links"><a href="../">GraceSong</a> · <a href="../terms.html">Terms</a> · <a href="../privacy.html">Privacy</a></p>
+</footer>
+
+<script src="share.js"></script>
+</body>
+</html>
