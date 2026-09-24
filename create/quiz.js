@@ -354,7 +354,7 @@ const SCREENS = [
       <div class="sample">
         <button type="button" class="sample-play" id="sample-play" aria-label="Play sample">▶</button>
         <div><div class="sample-t">Hear a sample: “Brenda, You Are My Grace”</div><div class="sample-d">An example of a GraceSong made from a story like yours</div></div>
-        <audio id="sample-audio" src="../samples/brenda-you-are-my-grace.mp3" preload="none"></audio>
+        <audio id="sample-audio" src="/samples/brenda-you-are-my-grace.mp3" preload="none"></audio>
       </div>`;
     },
     bind: (root) => {
@@ -401,7 +401,7 @@ const SCREENS = [
         <button type="button" class="edit-link" id="edit">Review or edit your answers</button>
       </div>
       <div class="guarantee"><span style="font-size:26px">🛡️</span><div><b>7-day “love it” guarantee</b>If the song doesn't touch your heart, email us within 7 days of delivery and we'll refund you in full.</div></div>
-      <p class="fine">Our songwriters use modern AI-assisted music production tools to bring your lyrics to life. Secure payment by Stripe. By ordering you agree to our <a href="../terms.html" target="_blank">Terms</a> and <a href="../privacy.html" target="_blank">Privacy Policy</a>.</p>`,
+      <p class="fine">Our songwriters use modern AI-assisted music production tools to bring your lyrics to life. Secure payment by Stripe. By ordering you agree to our <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</p>`,
     bind: (root) => {
       bindText(root, "#f-buyer", "buyerName");
       bindText(root, "#f-email", "email");
