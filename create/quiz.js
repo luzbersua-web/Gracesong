@@ -493,20 +493,32 @@ async function checkout() {
   const order = { ...data, email: data.email.trim(), createdAt: new Date().toISOString() };
   delete order.step;
   try {
-    // /api/checkout guarda el pedido y devuelve la URL de Stripe Checkout (se conecta en el siguiente paso)
+    // /api/checkout guarda el pedido y devuelve la URL de Stripe Checkout
     const r = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(order) });
     if (!r.ok) throw new Error("HTTP " + r.status);
     const { url } = await r.json();
     window.location.href = url;
   } catch (e) {
-    console.info("Pedido (checkout aún no conectado):", order);
+    console.error("checkout:", e);
     const err = $("#err");
-    err.textContent = "Checkout isn't connected yet (test mode). Your answers are saved.";
+    err.textContent = "Something went wrong opening the secure checkout. Please try again — your answers are saved.";
     err.hidden = false;
     btnNext.disabled = false;
     btnNext.textContent = SCREENS[step].next;
   }
 }
+
+// Si volvió de Stripe sin pagar (?canceled=1), lo dejamos directo en el último paso con sus respuestas
+(function resumeCanceled() {
+  if (new URLSearchParams(location.search).get("canceled") !== "1" || !data.email) return;
+  step = SCREENS.length - 1;
+  save();
+  history.replaceState(null, "", location.pathname);
+  setTimeout(() => {
+    const err = $("#err");
+    if (err) { err.textContent = "Your payment wasn't completed. Your answers are saved — you can try again whenever you're ready."; err.hidden = false; }
+  }, 0);
+})();
 
 // Desde la landing llega ?for=wife (etc.): dejamos esa opción marcada en el primer paso
 (function preselect() {

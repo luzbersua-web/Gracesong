@@ -1,0 +1,11 @@
+{
+  "name": "gracesong",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "22.x" },
+  "dependencies": {
+    "@vercel/blob": "^2.8.0",
+    "resend": "^6.30.0",
+    "stripe": "^22.6.2"
+  }
+}

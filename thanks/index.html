@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank You — GraceSong</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/assets/logo-160.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/landing.css">
+<style>
+  .ty{max-width:560px;margin:0 auto;padding:40px 16px 56px;text-align:center}
+  .ty-ico{font-size:52px;margin-bottom:8px}
+  .ty h1{font-family:var(--serif);color:var(--navy);font-size:30px;line-height:1.2;margin-bottom:12px}
+  .ty .lead-t{font-size:16.5px;line-height:1.6;color:var(--muted);margin-bottom:22px}
+  .ty-card{background:var(--paper);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:left;margin-bottom:16px}
+  .ty-card li{list-style:none;padding:8px 0 8px 30px;position:relative;font-size:15px;line-height:1.5;border-bottom:1px solid #F3EDE1}
+  .ty-card li:last-child{border-bottom:none}
+  .ty-card li span{position:absolute;left:0;top:7px}
+  .ty-react{background:#FFFBF0;border:2px solid var(--gold);border-radius:14px;padding:18px;font-size:15px;line-height:1.55;margin-bottom:18px}
+  .ty-react b{color:var(--navy)}
+  .ty-react a{color:var(--gold-dark);font-weight:600}
+  .ty .small{font-size:13px;color:var(--muted);line-height:1.6}
+  .ty .small a{color:var(--muted)}
+  .wait{color:var(--muted);font-size:15px;padding:40px 0}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a class="brand" href="/"><img src="/assets/logo-160.png" alt="" width="34" height="34"><span>Grace<b>Song</b></span></a>
+</nav>
+
+<main class="ty">
+  <div id="loading" class="wait">Confirming your order…</div>
+
+  <div id="ok" hidden>
+    <div class="ty-ico">🎵</div>
+    <h1 id="ty-title">Thank you! We're writing your song.</h1>
+    <p class="lead-t" id="ty-lead">Your order is confirmed. Check your inbox — we just sent you a confirmation email.</p>
+    <ul class="ty-card">
+      <li><span>✉️</span>A confirmation email is on its way to you.</li>
+      <li><span>✍️</span>Our team is turning your story into lyrics and music.</li>
+      <li><span>⏱️</span><b id="ty-ready">Your song will arrive within 24 hours.</b></li>
+      <li><span>🔗</span>You'll get a private link to listen, download and share.</li>
+    </ul>
+    <div class="ty-react">🎥 <b>When they hear it for the first time, press record.</b> Send us their reaction and we'll gift you a free GraceSong for someone else you love. <a href="/share">See how it works →</a></div>
+    <p class="small">Want to add a detail or fix a name? Just reply to the confirmation email or write to <a href="mailto:gracesongofficial@gmail.com">gracesongofficial@gmail.com</a>.<br>Don't see our email? Check your spam or promotions folder.</p>
+  </div>
+
+  <div id="fail" hidden>
+    <div class="ty-ico">🙏</div>
+    <h1>We couldn't confirm your payment yet</h1>
+    <p class="lead-t">If you completed the payment, don't worry — you'll receive a confirmation email in a few minutes. If you have any question, write to <a href="mailto:gracesongofficial@gmail.com">gracesongofficial@gmail.com</a>.</p>
+  </div>
+</main>
+
+<script src="/thanks/thanks.js"></script>
+</body>
+</html>
