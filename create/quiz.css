@@ -126,3 +126,10 @@ textarea{min-height:120px;resize:vertical;line-height:1.5}
 .cards.compact .card-t{font-size:14.5px}
 
 .fine a{color:var(--muted)}
+
+/* Email: sugerencia de corrección y confirmación */
+.email-fix{display:block;margin-top:8px;background:#FFF6E0;border:1px solid #F0D58C;color:#6B4E10;border-radius:8px;padding:9px 12px;font-size:14px;text-align:left;width:100%}
+.email-fix[hidden]{display:none}
+.email-fix b{color:var(--navy)}
+.help.ok{color:var(--ok);font-weight:600}
+.help.bad{color:var(--err)}

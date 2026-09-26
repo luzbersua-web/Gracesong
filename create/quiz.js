@@ -384,7 +384,13 @@ const SCREENS = [
       <div class="block">
         <label class="label" for="f-email">Your email</label>
         <input type="email" id="f-email" maxlength="120" autocomplete="email" inputmode="email" placeholder="you@example.com" value="${esc(data.email)}">
+        <button type="button" class="email-fix" id="email-fix" hidden></button>
         <p class="help">We'll only send it to you — so the surprise stays a surprise.</p>
+      </div>
+      <div class="block">
+        <label class="label" for="f-email2">Confirm your email</label>
+        <input type="email" id="f-email2" maxlength="120" autocomplete="off" inputmode="email" placeholder="Type it again, please" value="${esc(data.email2)}">
+        <p class="help" id="email-match"></p>
       </div>
       <div class="order">
         <div class="order-row"><span>Custom song “${esc(truncate(data.title, 34))}”</span><span>$${PRICE}</span></div>
@@ -404,12 +410,38 @@ const SCREENS = [
       <p class="fine">Our songwriters use modern AI-assisted music production tools to bring your lyrics to life. Secure payment by Stripe. By ordering you agree to our <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</p>`,
     bind: (root) => {
       bindText(root, "#f-buyer", "buyerName");
-      bindText(root, "#f-email", "email");
       $("#edit").onclick = () => go(0);
+      // Email: sugerencia de dominio mal escrito y confirmación (para que la canción llegue sí o sí)
+      const e1 = $("#f-email"), e2 = $("#f-email2"), fix = $("#email-fix"), match = $("#email-match");
+      const refresh = () => {
+        const s = suggestEmail(e1.value);
+        fix.hidden = !s;
+        if (s) fix.innerHTML = `Did you mean <b>${esc(s)}</b>? Tap to fix`;
+        const a = e1.value.trim().toLowerCase(), b = e2.value.trim().toLowerCase();
+        match.textContent = b ? (a === b ? "✓ Emails match" : "The emails don't match yet") : "";
+        match.className = "help " + (b ? (a === b ? "ok" : "bad") : "");
+      };
+      e1.oninput = () => { data.email = e1.value; data.emailTypoOk = false; e1.classList.remove("field-err"); save(); refresh(); };
+      e2.oninput = () => { data.email2 = e2.value; e2.classList.remove("field-err"); save(); refresh(); };
+      e2.onpaste = (ev) => ev.preventDefault(); // que lo escriba de nuevo, no que copie el error
+      fix.onclick = () => {
+        const s = suggestEmail(e1.value);
+        if (!s) return;
+        e1.value = data.email = s;
+        if (e2.value) e2.value = data.email2 = s;
+        save(); refresh();
+      };
+      refresh();
     },
     valid: () => {
+      const email = (data.email || "").trim().toLowerCase();
       if (!(data.buyerName || "").trim()) return ["Please write your first name.", "#f-buyer"];
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((data.email || "").trim())) return ["Please check your email address.", "#f-email"];
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return ["Please check your email address.", "#f-email"];
+      if (suggestEmail(email) && !data.emailTypoOk) {
+        data.emailTypoOk = true; // si insiste, en el segundo intento lo dejamos pasar
+        return [`Please double-check your email — did you mean ${suggestEmail(email)}?`, "#f-email"];
+      }
+      if (email !== (data.email2 || "").trim().toLowerCase()) return ["Please type the same email in both boxes, so your song reaches you.", "#f-email2"];
       return null;
     },
     next: `Create My Song — $${PRICE}`,
@@ -421,6 +453,31 @@ function firstSentence(s) {
   const t = (s || "").trim().split(/(?<=[.!?])\s|\n/)[0] || "";
   return t ? `“${truncate(t, 120)}”` : null;
 }
+// Dominios de email más usados en EE. UU. y sus errores típicos (gmial.com, hotmal.com, yahoo.con…)
+const EMAIL_DOMAINS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "aol.com", "icloud.com", "live.com", "msn.com", "comcast.net", "att.net", "verizon.net", "sbcglobal.net", "me.com", "ymail.com", "bellsouth.net", "charter.net", "cox.net", "protonmail.com"];
+function editDistance(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++)
+    for (let j = 1; j <= b.length; j++)
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+function suggestEmail(value) {
+  const v = (value || "").trim().toLowerCase();
+  const at = v.lastIndexOf("@");
+  if (at < 1) return null;
+  const user = v.slice(0, at), dom = v.slice(at + 1);
+  if (!dom || EMAIL_DOMAINS.includes(dom)) return null;
+  let best = null, bestD = 3;
+  for (const d of EMAIL_DOMAINS) {
+    const dist = editDistance(dom, d);
+    if (dist > 0 && dist < bestD) { best = d; bestD = dist; }
+  }
+  // solo sugerimos si el dominio se parece mucho a uno conocido (1–2 letras distintas)
+  return best && (bestD === 1 || dom.length >= 7) ? `${user}@${best}` : null;
+}
+
 function truncate(s, n) { s = (s || "").trim(); return s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s; }
 
 function bindText(root, sel, key) {
