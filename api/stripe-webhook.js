@@ -1,6 +1,6 @@
 // POST /api/stripe-webhook — Stripe avisa cuando se paga. Marca el pedido como pagado y envía los emails.
 import {
-  stripe, json, loadOrder, saveOrder, sendEmail, esc, musicStyle, lyricPrompt, recipientLabel, deliveryDate, NOTIFY_EMAIL,
+  stripe, json, siteOrigin, loadOrder, saveOrder, sendEmail, esc, musicStyle, lyricPrompt, recipientLabel, deliveryDate, sendMetaPurchase, NOTIFY_EMAIL,
 } from "./_lib.js";
 
 export async function POST(req) {
@@ -39,7 +39,7 @@ export async function POST(req) {
   });
   await saveOrder(order);
 
-  await Promise.all([notifyOwner(order), confirmCustomer(order)]);
+  await Promise.all([notifyOwner(order), confirmCustomer(order), sendMetaPurchase(order, session, siteOrigin(req))]);
   return json({ ok: true });
 }
 

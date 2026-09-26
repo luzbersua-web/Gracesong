@@ -1,5 +1,5 @@
 // POST /api/checkout — guarda el pedido (aún sin pagar) y devuelve la URL de Stripe Checkout.
-import { stripe, json, siteOrigin, newOrderId, saveOrder, cleanOrder, orderProblem, PRICE_CENTS } from "./_lib.js";
+import { stripe, json, siteOrigin, newOrderId, saveOrder, cleanOrder, orderProblem, metaContext, PRICE_CENTS } from "./_lib.js";
 
 export async function POST(req) {
   let input;
@@ -13,6 +13,7 @@ export async function POST(req) {
   order.status = "pending_payment";
   order.createdAt = new Date().toISOString();
   order.amount = PRICE_CENTS;
+  order.meta = metaContext(req); // para la API de Conversiones de Meta
 
   const origin = siteOrigin(req);
   const who = order.relation === "myself" ? "you" : order.name;

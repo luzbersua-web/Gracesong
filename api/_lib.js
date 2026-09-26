@@ -133,3 +133,62 @@ export async function sendEmail({ to, subject, html, replyTo }) {
 }
 
 export const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// ---------- Meta: API de Conversiones ----------
+export const META_PIXEL_ID = process.env.META_PIXEL_ID || "4584382561806826";
+
+// Datos del navegador que ayudan a Meta a reconocer al comprador (se guardan con el pedido en /api/checkout).
+export function metaContext(req) {
+  const cookies = {};
+  for (const part of (req.headers.get("cookie") || "").split(";")) {
+    const i = part.indexOf("=");
+    if (i > 0) cookies[part.slice(0, i).trim()] = part.slice(i + 1).trim();
+  }
+  return {
+    fbp: cookies._fbp || null,
+    fbc: cookies._fbc || null,
+    ip: (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || null,
+    ua: req.headers.get("user-agent") || null,
+  };
+}
+
+const sha256 = async (s) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))]
+  .map((b) => b.toString(16).padStart(2, "0")).join("");
+
+// Purchase desde el servidor, con el mismo event_id que el píxel de /thanks para que Meta no lo cuente dos veces.
+export async function sendMetaPurchase(o, session, origin) {
+  const token = process.env.META_CAPI_TOKEN;
+  if (!token) { console.warn("META_CAPI_TOKEN no configurado; Purchase no enviado a Meta"); return; }
+  const m = o.meta || {};
+  const firstName = (o.buyerName || "").trim().split(/\s+/)[0].toLowerCase();
+  const user_data = {
+    em: [await sha256(o.email.trim().toLowerCase())],
+    external_id: [await sha256(o.id)],
+    ...(firstName && { fn: [await sha256(firstName)] }),
+    ...(m.ip && { client_ip_address: m.ip }),
+    ...(m.ua && { client_user_agent: m.ua }),
+    ...(m.fbp && { fbp: m.fbp }),
+    ...(m.fbc && { fbc: m.fbc }),
+  };
+  const body = {
+    data: [{
+      event_name: "Purchase",
+      event_time: Math.floor(Date.now() / 1000),
+      event_id: session.id,
+      action_source: "website",
+      event_source_url: `${origin}/thanks`,
+      user_data,
+      custom_data: { value: (session.amount_total || 0) / 100, currency: (session.currency || "usd").toUpperCase(), content_name: "GraceSong", order_id: o.id },
+    }],
+    ...(process.env.META_TEST_EVENT_CODE && { test_event_code: process.env.META_TEST_EVENT_CODE }),
+    access_token: token,
+  };
+  try {
+    const r = await fetch(`https://graph.facebook.com/v23.0/${META_PIXEL_ID}/events`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+    });
+    if (!r.ok) console.error("Meta CAPI:", r.status, await r.text());
+  } catch (e) {
+    console.error("Meta CAPI:", e.message);
+  }
+}
