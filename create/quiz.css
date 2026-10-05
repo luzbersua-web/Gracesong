@@ -88,11 +88,17 @@ textarea{min-height:120px;resize:vertical;line-height:1.5}
 .order{background:var(--paper);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px}
 .order-row{display:flex;justify-content:space-between;padding:8px 0;font-size:15px;border-bottom:1px solid #F1EBDF}
 .order-row:last-child{border-bottom:none}
+.order-row[hidden]{display:none}
 .order-row.total{font-weight:700;font-size:18px;color:var(--navy);padding-top:12px}
 .incl{color:var(--ok);font-weight:600}
 .perks{list-style:none;margin:14px 0 4px}
 .perks li{font-size:14px;padding:5px 0 5px 24px;position:relative;line-height:1.4}
 .perks li::before{content:'✓';position:absolute;left:0;color:var(--ok);font-weight:700}
+.bump{display:block;background:#FFFBEA;border:2px dashed var(--gold);border-radius:12px;padding:14px;margin-bottom:16px;cursor:pointer}
+.bump-head{display:flex;gap:10px;align-items:center;font-weight:700;color:var(--navy);font-size:15.5px}
+.bump-head input{width:22px;height:22px;flex:none;accent-color:var(--gold-dark);cursor:pointer}
+.bump-head b{color:var(--gold-dark)}
+.bump p{font-size:13.5px;line-height:1.45;color:var(--muted);margin:8px 0 0 32px}
 .guarantee{display:flex;gap:12px;align-items:center;background:#FBF6EA;border:1px solid #EFE2BF;border-radius:12px;padding:14px;font-size:13.5px;line-height:1.45;color:#5C4A1E;margin-bottom:16px}
 .guarantee b{display:block;color:var(--navy);font-size:14.5px}
 .edit-link{background:none;border:none;color:var(--gold-dark);text-decoration:underline;font-size:13px;padding:0}

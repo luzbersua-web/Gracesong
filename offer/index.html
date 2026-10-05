@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One More Gift — GraceSong</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/assets/logo-160.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/landing.css">
+<style>
+  .of{max-width:560px;margin:0 auto;padding:22px 16px 56px;text-align:center}
+  .of-ok{display:inline-block;background:#EAF5EF;color:var(--ok);font-weight:600;font-size:14px;padding:8px 14px;border-radius:30px;margin-bottom:18px}
+  .of-steps{display:flex;justify-content:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:18px}
+  .of-steps span{padding:4px 10px;border-radius:20px;background:#F1EBDF}
+  .of-steps span.on{background:var(--navy);color:var(--gold-light)}
+  .of .eyebrow{color:var(--gold-dark)}
+  .of h1{font-family:var(--serif);color:var(--navy);font-size:28px;line-height:1.22;margin-bottom:12px}
+  .of .lead-t{font-size:16.5px;line-height:1.6;color:var(--muted);margin-bottom:20px}
+  .of-card{background:var(--paper);border:2px solid var(--gold);border-radius:16px;padding:20px;text-align:left;margin-bottom:18px;box-shadow:0 8px 30px rgba(27,42,74,.08)}
+  .of-price{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:6px 10px;margin-bottom:14px}
+  .of-price em{white-space:nowrap}
+  .of-price b{font-family:var(--serif);font-size:38px;color:var(--navy)}
+  .of-price s{color:#999;font-size:18px}
+  .of-price em{font-style:normal;background:#FBEFD0;color:var(--gold-dark);font-weight:700;font-size:13px;padding:4px 10px;border-radius:20px}
+  .of-card li{list-style:none;padding:7px 0 7px 28px;position:relative;font-size:15px;line-height:1.45}
+  .of-card li::before{content:'✓';position:absolute;left:4px;color:var(--ok);font-weight:700}
+  .of-video{width:220px;max-width:70%;aspect-ratio:9/16;border-radius:14px;margin:0 auto 16px;background:#0F1B30;box-shadow:0 10px 30px rgba(15,27,48,.35);display:block}
+  .of-who{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 0 18px}
+  .of-who span{background:#FBF6EA;border:1px solid #EFE2BF;border-radius:20px;padding:6px 12px;font-size:14px}
+  .btn-main.full{width:100%;border:none;cursor:pointer;font-family:inherit}
+  .btn-main[disabled]{opacity:.7;cursor:wait}
+  .of-note{font-size:13px;color:var(--muted);margin:10px 0 18px;line-height:1.5}
+  .of-no{background:none;border:none;color:var(--muted);text-decoration:underline;font-size:14.5px;cursor:pointer;padding:8px;font-family:inherit}
+  .of-err{color:#B23B3B;font-size:14px;margin-top:10px}
+  .wait{color:var(--muted);font-size:15px;padding:40px 0}
+</style>
+<script src="/assets/pixel.js"></script>
+</head>
+<body>
+<nav class="nav">
+  <a class="brand" href="/"><img src="/assets/logo-160.png" alt="" width="34" height="34"><span>Grace<b>Song</b></span></a>
+</nav>
+
+<main class="of">
+  <div id="loading" class="wait">Confirming your order…</div>
+
+  <!-- Upsell: 2ª canción -->
+  <section id="song2" hidden>
+    <div class="of-ok">✓ Payment received — your song is being written</div>
+    <div class="of-steps"><span>1. Order</span><span class="on">2. One more gift</span><span>3. Done</span></div>
+    <div class="eyebrow">Wait — before you go</div>
+    <h1>Who else would cry hearing <em>their own</em> song this Christmas?</h1>
+    <p class="lead-t">Add a second GraceSong for someone else you love — written from their own story, just like <span class="js-name">hers</span>.</p>
+    <div class="of-who"><span>🌷 Mom</span><span>🌿 Dad</span><span>🎀 Your children</span><span>🧶 Grandparents</span><span>🕊️ Someone in heaven</span></div>
+    <div class="of-card">
+      <div class="of-price"><s>$37</s><b>$27</b><em>Save $10 — only on this page</em></div>
+      <ul>
+        <li>A complete, personalized Christian song for a second person</li>
+        <li>Tell us their story whenever you're ready — today or next week</li>
+        <li>Ready within 24 hours after you send their story</li>
+        <li>Same 7-day “love it” guarantee</li>
+      </ul>
+    </div>
+    <button type="button" class="btn-main full" id="yes-song2">Yes, add a second song — $27</button>
+    <p class="of-note">One click: charged to the card you just used. No need to enter anything again.</p>
+    <p class="of-err" id="err-song2" hidden></p>
+    <button type="button" class="of-no" id="no-song2">No thanks, one song is enough</button>
+  </section>
+
+  <!-- Downsell: video con la letra -->
+  <section id="video" hidden>
+    <div class="of-ok">✓ Payment received — your song is being written</div>
+    <div class="of-steps"><span>1. Order</span><span class="on">2. One more gift</span><span>3. Done</span></div>
+    <div class="eyebrow">One last idea</div>
+    <h1>Let <span class="js-name">her</span> see every word, too</h1>
+    <p class="lead-t">Turn the song into a beautiful lyric video — every line appears as it's sung. Share it on Facebook, send it to family, or play it on the TV at your celebration.</p>
+    <video class="of-video" src="/samples/lyric-video-sample.mp4" poster="/samples/lyric-video-poster.jpg" controls playsinline preload="none"></video>
+    <div class="of-card">
+      <div class="of-price"><b>$12</b><em>Only on this page</em></div>
+      <ul>
+        <li>Vertical version for phones, Facebook and Instagram</li>
+        <li>Widescreen version for the TV</li>
+        <li>Arrives together with the song</li>
+      </ul>
+    </div>
+    <button type="button" class="btn-main full" id="yes-video">Yes, add the lyric video — $12</button>
+    <p class="of-note">One click: charged to the card you just used.</p>
+    <p class="of-err" id="err-video" hidden></p>
+    <button type="button" class="of-no" id="no-video">No thanks, just the song</button>
+  </section>
+</main>
+
+<script src="/offer/offer.js"></script>
+</body>
+</html>

@@ -25,6 +25,9 @@
   .ty .small{font-size:13px;color:var(--muted);line-height:1.6}
   .ty .small a{color:var(--muted)}
   .wait{color:var(--muted);font-size:15px;padding:40px 0}
+  .ty-song2{background:var(--navy);color:#fff;border-radius:14px;padding:20px;margin-bottom:16px}
+  .ty-song2 h2{font-family:var(--serif);color:var(--gold-light);font-size:21px;margin-bottom:8px}
+  .ty-song2 p{font-size:15px;line-height:1.55;margin-bottom:14px;color:#E8ECF4}
 </style>
 <script src="/assets/pixel.js"></script>
 </head>
@@ -45,9 +48,22 @@
       <li><span>✍️</span>Our team is turning your story into lyrics and music.</li>
       <li><span>⏱️</span><b id="ty-ready">Your song will arrive within 24 hours.</b></li>
       <li><span>🔗</span>You'll get a private link to listen, download and share.</li>
+      <li id="ty-video" hidden><span>🎬</span>Your lyric video will arrive together with the song.</li>
     </ul>
+    <div class="ty-song2" id="ty-song2" hidden>
+      <h2>🎵 Your second song is reserved</h2>
+      <p>Tell us about the second person whenever you're ready — today or next week. We also emailed you this link.</p>
+      <a class="btn-main" id="ty-song2-link" href="#">Tell us about them →</a>
+    </div>
     <div class="ty-react">🎥 <b>When they hear it for the first time, press record.</b> Send us their reaction and we'll gift you a free GraceSong for someone else you love. <a href="/share">See how it works →</a></div>
     <p class="small">Want to add a detail or fix a name? Just reply to the confirmation email or write to <a href="mailto:gracesongofficial@gmail.com">gracesongofficial@gmail.com</a>.<br>Don't see our email? Check your spam or promotions folder.</p>
+  </div>
+
+  <div id="second" hidden>
+    <div class="ty-ico">🎵</div>
+    <h1>Thank you! We're writing your second song.</h1>
+    <p class="lead-t" id="second-lead">We received their story. Check your inbox — we just sent you a confirmation email.</p>
+    <p class="small">Want to add a detail or fix a name? Just reply to the confirmation email.</p>
   </div>
 
   <div id="fail" hidden>

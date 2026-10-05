@@ -4,6 +4,12 @@ import { put, get } from "@vercel/blob";
 import { Resend } from "resend";
 
 export const PRICE_CENTS = 3700;
+export const BUMP_CENTS = 1200; // order bump: Keepsake Lyric Art
+// Ofertas después del pago: upsell (2ª canción) y downsell (video con la letra)
+export const OFFERS = {
+  song2: { cents: 2700, name: "Second GraceSong", desc: "A second personalized song for someone else you love" },
+  video: { cents: 1200, name: "Lyric Video", desc: "Your song as a lyric video, for phones and TV" },
+};
 export const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL || "gracesongofficial@gmail.com";
 export const EMAIL_FROM = process.env.EMAIL_FROM || "GraceSong <hello@getgracesong.com>";
 const BLOB_ACCESS = process.env.BLOB_ACCESS || "private";
@@ -21,11 +27,11 @@ export function siteOrigin(req) {
   return `${proto}://${host}`;
 }
 
-export function newOrderId() {
+export function randomCode(n) {
   const abc = "abcdefghjkmnpqrstuvwxyz23456789";
-  const bytes = crypto.getRandomValues(new Uint8Array(12));
-  return "gs_" + [...bytes].map((b) => abc[b % abc.length]).join("");
+  return [...crypto.getRandomValues(new Uint8Array(n))].map((b) => abc[b % abc.length]).join("");
 }
+export const newOrderId = () => "gs_" + randomCode(12);
 
 // ---------- pedidos en Vercel Blob (privados) ----------
 const orderPath = (id) => `orders/${id}.json`;
@@ -57,6 +63,7 @@ export function cleanOrder(input) {
     if (typeof v === "string") o[k] = v.trim().slice(0, max);
   }
   o.qualities = Array.isArray(input?.qualities) ? input.qualities.filter((q) => typeof q === "string").slice(0, 5).map((q) => q.slice(0, 30)) : [];
+  o.bump = input?.bump === true;
   return o;
 }
 
@@ -155,8 +162,9 @@ export function metaContext(req) {
 const sha256 = async (s) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))]
   .map((b) => b.toString(16).padStart(2, "0")).join("");
 
-// Purchase desde el servidor, con el mismo event_id que el píxel de /thanks para que Meta no lo cuente dos veces.
-export async function sendMetaPurchase(o, session, origin) {
+// Purchase desde el servidor, con el mismo event_id que el píxel del navegador para que Meta no lo cuente dos veces.
+// compra = { eventId, value (dólares), currency }
+export async function sendMetaPurchase(o, compra, origin) {
   const token = process.env.META_CAPI_TOKEN;
   if (!token) { console.warn("META_CAPI_TOKEN no configurado; Purchase no enviado a Meta"); return; }
   const m = o.meta || {};
@@ -174,11 +182,11 @@ export async function sendMetaPurchase(o, session, origin) {
     data: [{
       event_name: "Purchase",
       event_time: Math.floor(Date.now() / 1000),
-      event_id: session.id,
+      event_id: compra.eventId,
       action_source: "website",
       event_source_url: `${origin}/thanks`,
       user_data,
-      custom_data: { value: (session.amount_total || 0) / 100, currency: (session.currency || "usd").toUpperCase(), content_name: "GraceSong", order_id: o.id },
+      custom_data: { value: compra.value, currency: compra.currency || "USD", content_name: compra.name || "GraceSong", order_id: o.id },
     }],
     ...(process.env.META_TEST_EVENT_CODE && { test_event_code: process.env.META_TEST_EVENT_CODE }),
     access_token: token,

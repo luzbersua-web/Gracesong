@@ -8,6 +8,16 @@
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem("gs_order_v1")); } catch { /* sin datos */ }
 
+  // Llegó desde el cuestionario de la 2ª canción (ya pagada en la oferta)
+  const second = new URLSearchParams(location.search).get("second");
+  if (second) {
+    $("loading").hidden = true;
+    $("second").hidden = false;
+    if (second !== "1") $("second-lead").textContent = `We received their story. Their song will arrive by ${second}. Check your inbox — we just sent you a confirmation email.`;
+    try { localStorage.removeItem("gs_order_v1"); } catch { /* modo privado */ }
+    return;
+  }
+
   let st = null;
   if (sessionId) {
     try {
@@ -24,6 +34,8 @@
   else if (saved?.name) $("ty-title").textContent = `Thank you! We're writing ${saved.name}'s song.`;
   if (saved?.title) $("ty-lead").textContent = `Your order for “${saved.title}” is confirmed. We just sent a confirmation email to ${saved.email || "you"}.`;
   if (st.readyBy) $("ty-ready").textContent = `Your song will arrive by ${st.readyBy}.`;
+  if ((st.offers || []).includes("video")) $("ty-video").hidden = false;
+  if (st.song2Link) { $("ty-song2").hidden = false; $("ty-song2-link").href = st.song2Link; }
 
   // Compra para el píxel: una sola vez por sesión, con el mismo ID que usará la API de Conversiones
   try {

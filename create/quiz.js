@@ -4,6 +4,8 @@
 
 const STORE_KEY = "gs_order_v1";
 const PRICE = 37;
+const BUMP = 12; // order bump: Keepsake Lyric Art
+const total = () => (data.prepaid ? 0 : PRICE + (data.bump ? BUMP : 0));
 
 const RELATIONS = [
   { v: "wife", t: "My wife", ico: "💍", p: "her" },
@@ -393,10 +395,11 @@ const SCREENS = [
         <p class="help" id="email-match"></p>
       </div>
       <div class="order">
-        <div class="order-row"><span>Custom song “${esc(truncate(data.title, 34))}”</span><span>$${PRICE}</span></div>
+        <div class="order-row"><span>${data.prepaid ? "Second song" : "Custom song"} “${esc(truncate(data.title, 34))}”</span><span${data.prepaid ? ' class="incl">Prepaid ✓' : `>$${PRICE}`}</span></div>
         <div class="order-row"><span>24-hour delivery</span><span class="incl">Included</span></div>
         <div class="order-row"><span>Printable lyric sheet</span><span class="incl">Included</span></div>
-        <div class="order-row total"><span>Total</span><span>$${PRICE}</span></div>
+        <div class="order-row" id="bump-row"${data.bump ? "" : " hidden"}><span>Keepsake Lyric Art</span><span>$${BUMP}</span></div>
+        <div class="order-row total"><span>Total</span><span id="total-amt">$${total()}</span></div>
         <ul class="perks">
           <li>Written from your story — never a template</li>
           <li>Ready by ${deliveryDate()}</li>
@@ -406,11 +409,21 @@ const SCREENS = [
         </ul>
         <button type="button" class="edit-link" id="edit">Review or edit your answers</button>
       </div>
+      ${data.prepaid ? "" : `<label class="bump" for="f-bump">
+        <div class="bump-head"><input type="checkbox" id="f-bump"${data.bump ? " checked" : ""}><span>Yes! Add Keepsake Lyric Art <b>(+$${BUMP})</b></span></div>
+        <p>A beautifully designed, frame-ready print of ${data.relation === "myself" ? "your" : pronoun().pos} song — with your names, your special date and your verse. Print it at any Walmart or Walgreens the same day.</p>
+      </label>`}
       <div class="guarantee"><span style="font-size:26px">🛡️</span><div><b>7-day “love it” guarantee</b>If the song doesn't touch your heart, email us within 7 days of delivery and we'll refund you in full.</div></div>
       <p class="fine">Our songwriters use modern AI-assisted music production tools to bring your lyrics to life. Secure payment by Stripe. By ordering you agree to our <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</p>`,
     bind: (root) => {
       bindText(root, "#f-buyer", "buyerName");
       $("#edit").onclick = () => go(0);
+      if ($("#f-bump")) $("#f-bump").onchange = (ev) => {
+        data.bump = ev.target.checked; save();
+        $("#bump-row").hidden = !data.bump;
+        $("#total-amt").textContent = `$${total()}`;
+        btnNext.textContent = nextLabel(SCREENS[step]);
+      };
       // Email: sugerencia de dominio mal escrito y confirmación (para que la canción llegue sí o sí)
       const e1 = $("#f-email"), e2 = $("#f-email2"), fix = $("#email-fix"), match = $("#email-match");
       const refresh = () => {
@@ -444,7 +457,7 @@ const SCREENS = [
       if (email !== (data.email2 || "").trim().toLowerCase()) return ["Please type the same email in both boxes, so your song reaches you.", "#f-email2"];
       return null;
     },
-    next: `Create My Song — $${PRICE}`,
+    next: () => (data.prepaid ? "Send their story →" : `Create My Song — $${total()}`),
     buy: true,
   },
 ];
@@ -505,10 +518,12 @@ function render() {
   $("#progress-step").textContent = `Step ${step + 1} of ${SCREENS.length}`;
   $("#progress-hint").textContent = s.hint;
   btnBack.hidden = step === 0;
-  btnNext.textContent = s.next || "Next →";
+  btnNext.textContent = nextLabel(s);
   btnNext.classList.toggle("buy", !!s.buy);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+function nextLabel(s) { return (typeof s.next === "function" ? s.next() : s.next) || "Next →"; }
 
 function go(n) {
   step = n; save();
@@ -539,12 +554,37 @@ btnNext.onclick = () => {
     return;
   }
   if (step === 0) track("Lead");
-  if (s.buy) return checkout();
+  if (s.buy) return data.prepaid ? sendPrepaid() : checkout();
   go(step + 1);
 };
 
+// 2ª canción ya pagada en la oferta: solo enviamos la historia
+async function sendPrepaid() {
+  btnNext.disabled = true;
+  btnNext.textContent = "Sending…";
+  const order = { ...data, email: data.email.trim() };
+  delete order.step;
+  try {
+    const r = await fetch("/api/second-song", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(order) });
+    const res = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(res.error || "HTTP " + r.status);
+    window.location.href = "/thanks?second=" + encodeURIComponent(res.readyBy || "1");
+  } catch (e) {
+    console.error("second-song:", e);
+    const err = $("#err");
+    err.textContent = e.message === "already_used"
+      ? "We already received the story for this second song. Questions? Write to gracesongofficial@gmail.com."
+      : e.message === "invalid_link"
+        ? "This link isn't valid. Please use the link from your email, or write to gracesongofficial@gmail.com."
+        : "Something went wrong sending your story. Please try again — your answers are saved.";
+    err.hidden = false;
+    btnNext.disabled = false;
+    btnNext.textContent = nextLabel(SCREENS[step]);
+  }
+}
+
 async function checkout() {
-  track("InitiateCheckout", { value: PRICE, currency: "USD" });
+  track("InitiateCheckout", { value: total(), currency: "USD" });
   btnNext.disabled = true;
   btnNext.textContent = "Preparing secure checkout…";
   const order = { ...data, email: data.email.trim(), createdAt: new Date().toISOString() };
@@ -561,9 +601,21 @@ async function checkout() {
     err.textContent = "Something went wrong opening the secure checkout. Please try again — your answers are saved.";
     err.hidden = false;
     btnNext.disabled = false;
-    btnNext.textContent = SCREENS[step].next;
+    btnNext.textContent = nextLabel(SCREENS[step]);
   }
 }
+
+// 2ª canción comprada en la oferta: llega con ?prepaid=<pedido>.<token> (enlace del email o de /thanks)
+(function prepaid() {
+  const p = new URLSearchParams(location.search).get("prepaid");
+  if (p && /^gs_[a-z0-9]{12}\.[a-z0-9]{16}$/.test(p)) {
+    if (data.prepaid !== p) { data = { qualities: [], prepaid: p }; step = 0; }
+    save();
+  } else if (data.prepaid) {
+    delete data.prepaid; // un pedido normal no hereda el modo "ya pagado"
+    save();
+  }
+})();
 
 // Si volvió de Stripe sin pagar (?canceled=1), lo dejamos directo en el último paso con sus respuestas
 (function resumeCanceled() {
