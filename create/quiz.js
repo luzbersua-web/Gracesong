@@ -409,18 +409,26 @@ const SCREENS = [
         </ul>
         <button type="button" class="edit-link" id="edit">Review or edit your answers</button>
       </div>
-      ${data.prepaid ? "" : `<label class="bump" for="f-bump">
+      ${data.prepaid ? "" : `<div class="bump"><label for="f-bump">
         <div class="bump-head"><input type="checkbox" id="f-bump"${data.bump ? " checked" : ""}><span>Yes! Add Keepsake Lyric Art <b>(+$${BUMP})</b></span></div>
         <p>A beautifully designed, frame-ready print of ${data.relation === "myself" ? "your" : pronoun().pos} song — with your names, your special date and your verse. Print it at any Walmart or Walgreens the same day.</p>
-      </label>`}
+      </label>
+      <div class="bump-styles" id="bump-styles"${data.bump ? "" : " hidden"}>
+        <p>Choose your style:</p>
+        <div class="bump-opts">
+          ${[["romantic", "Romantic"], ["classic", "Classic"]].map(([v, t]) => `<button type="button" class="bump-opt${(data.bumpstyle || "romantic") === v ? " on" : ""}" data-bumpstyle="${v}"><img src="/assets/lyric-art-${v}.webp" alt="${t} style" width="240" height="300" loading="lazy"><span>${t}</span></button>`).join("")}
+        </div>
+      </div></div>`}
       <div class="guarantee"><span style="font-size:26px">🛡️</span><div><b>7-day “love it” guarantee</b>If the song doesn't touch your heart, email us within 7 days of delivery and we'll refund you in full.</div></div>
       <p class="fine">Our songwriters use modern AI-assisted music production tools to bring your lyrics to life. Secure payment by Stripe. By ordering you agree to our <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</p>`,
     bind: (root) => {
       bindText(root, "#f-buyer", "buyerName");
       $("#edit").onclick = () => go(0);
+      pickOne(root, "bumpstyle");
       if ($("#f-bump")) $("#f-bump").onchange = (ev) => {
         data.bump = ev.target.checked; save();
         $("#bump-row").hidden = !data.bump;
+        $("#bump-styles").hidden = !data.bump;
         $("#total-amt").textContent = `$${total()}`;
         btnNext.textContent = nextLabel(SCREENS[step]);
       };
@@ -587,7 +595,7 @@ async function checkout() {
   track("InitiateCheckout", { value: total(), currency: "USD" });
   btnNext.disabled = true;
   btnNext.textContent = "Preparing secure checkout…";
-  const order = { ...data, email: data.email.trim(), createdAt: new Date().toISOString() };
+  const order = { ...data, email: data.email.trim(), createdAt: new Date().toISOString(), bumpStyle: data.bumpstyle || "romantic" };
   delete order.step;
   try {
     // /api/checkout guarda el pedido y devuelve la URL de Stripe Checkout

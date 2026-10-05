@@ -4,6 +4,13 @@ import { sendEmail, esc, musicStyle, lyricPrompt, recipientLabel, NOTIFY_EMAIL, 
 function row(k, v) {
   return v ? `<tr><td style="padding:6px 10px;color:#666;vertical-align:top;white-space:nowrap">${esc(k)}</td><td style="padding:6px 10px">${esc(v).replace(/\n/g, "<br>")}</td></tr>` : "";
 }
+// Comando listo para la lámina; la fecha es la del regalo o, si no la puso, la de la compra
+function laminaCmd(o) {
+  const q = (v) => `"${String(v || "").replace(/"/g, "'")}"`;
+  const fecha = o.giftDate || (o.paidAt || new Date().toISOString()).slice(0, 10);
+  const verso = o.verse && o.verse !== "none" ? ` --versiculo ${q(o.verse)}` : "";
+  return `python hacer_lamina.py --titulo ${q(o.title)} --letra letra.txt --para ${q(o.relation === "myself" ? o.buyerName : o.name)} ${o.relation === "myself" ? "" : ` --de ${q(o.buyerName)}`} --fecha ${fecha}${verso}${o.bumpStyle === "classic" ? " --estilo clasica" : ""}`;
+}
 const money = (cents) => `$${(cents / 100).toFixed(2)}`;
 
 export async function notifyOwner(o) {
@@ -13,7 +20,9 @@ export async function notifyOwner(o) {
   const html = `
   <div style="font-family:Arial,sans-serif;max-width:680px">
     <h2 style="color:#1B2A4A">🎵 Nuevo pedido GraceSong — ${esc(o.id)}</h2>
-    ${o.bump ? `<p style="background:#FFF3C4;padding:10px;border-radius:8px">🖼️ <b>Incluye Keepsake Lyric Art (+$12):</b> enviar también la lámina diseñada en PDF 8×10 y 11×14.</p>` : ""}
+    ${o.bump ? `<div style="background:#FFF3C4;padding:10px;border-radius:8px"><p>🖼️ <b>Incluye Keepsake Lyric Art (+$12):</b> enviar también la lámina en PDF 8×10 y 11×14. Estilo elegido: <b>${o.bumpStyle === "classic" ? "Clásico" : "Romántico"}</b>.</p>
+      <p style="margin-top:6px">Guarda la letra en <code>letra.txt</code> dentro de <code>gracesong/lamina</code> y ejecuta ahí:</p>
+      <pre style="background:#fff;padding:8px;border-radius:6px;white-space:pre-wrap;font-size:12px">${esc(laminaCmd(o))}</pre></div>` : ""}
     <p><b>Entregar antes de:</b> ${esc(o.readyBy)} · ${pago}</p>
     <table style="border-collapse:collapse;font-size:14px;background:#faf7ef;border-radius:8px">
       ${row("Para", recipientLabel(o))}${row("Relación", o.relation)}${row("Pronombre", o.pronoun)}

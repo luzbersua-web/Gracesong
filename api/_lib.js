@@ -64,6 +64,7 @@ export function cleanOrder(input) {
   }
   o.qualities = Array.isArray(input?.qualities) ? input.qualities.filter((q) => typeof q === "string").slice(0, 5).map((q) => q.slice(0, 30)) : [];
   o.bump = input?.bump === true;
+  if (o.bump) o.bumpStyle = input?.bumpStyle === "classic" ? "classic" : "romantic";
   return o;
 }
 
