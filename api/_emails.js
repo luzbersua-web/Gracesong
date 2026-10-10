@@ -89,3 +89,21 @@ export async function confirmCustomerOffer(o, offer, link) {
   </div>`;
   return sendEmail({ to: o.email, subject: offer === "song2" ? "Tell us who your second GraceSong is for 🎵" : "Your GraceSong lyric video is confirmed 🎬", html, replyTo: NOTIFY_EMAIL });
 }
+
+// Entrega de la canción (después de que Luz la aprueba)
+export async function deliverSong(o, link) {
+  const who = o.relation === "myself" ? "your" : `${esc(o.name)}'s`;
+  const html = `
+  <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;color:#2C2C2C">
+    <p style="font-size:13px;letter-spacing:.1em;color:#A07830;text-transform:uppercase;font-family:Arial,sans-serif">GraceSong</p>
+    <h1 style="color:#1B2A4A;font-size:26px;line-height:1.25">${who.charAt(0).toUpperCase() + who.slice(1)} song is ready 🎵</h1>
+    <p style="font-size:16px;line-height:1.6">Hi ${esc(o.buyerName)}, “${esc(o.title)}” is finished. We wrote it from your story, and we hope it touches their heart as much as it touched ours.</p>
+    <p style="text-align:center;margin:26px 0"><a href="${esc(link)}" style="background:#C9A84C;color:#1B2A4A;padding:15px 30px;border-radius:30px;text-decoration:none;font-weight:bold;font-family:Arial,sans-serif">Listen to your song</a></p>
+    <p style="font-size:15px;line-height:1.6">On that page you can play it, <b>download it</b> and read the lyrics. Keep this email: the link is private and yours.</p>
+    <p style="font-size:15px;line-height:1.6;background:#FBF6EA;padding:14px;border-radius:10px">🎥 <b>When they hear it for the first time, press record.</b> Send us their reaction and we'll gift you a free GraceSong for someone else you love.</p>
+    <p style="font-size:15px;line-height:1.6">Want a small change? Just reply to this email.</p>
+    <p style="font-size:15px">With love,<br>The GraceSong team</p>
+    <p style="font-size:12px;color:#888;font-family:Arial,sans-serif">Order ${esc(o.id)} · 7-day “love it” guarantee</p>
+  </div>`;
+  return sendEmail({ to: o.email, subject: `${who.charAt(0).toUpperCase() + who.slice(1)} GraceSong is ready 🎵`, html, replyTo: NOTIFY_EMAIL });
+}

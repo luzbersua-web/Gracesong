@@ -2,6 +2,8 @@
 import { stripe, json, siteOrigin, loadOrder, saveOrder, deliveryDate, sendMetaPurchase } from "./_lib.js";
 import { notifyOwner, confirmCustomer } from "./_emails.js";
 import { recordOffer } from "./_offers.js";
+import { waitUntil } from "@vercel/functions";
+import { autoEnabled, produceOrder } from "./_produce.js";
 
 export async function POST(req) {
   const raw = await req.text();
@@ -45,5 +47,6 @@ export async function POST(req) {
   await saveOrder(order);
 
   await Promise.all([notifyOwner(order), confirmCustomer(order), sendMetaPurchase(order, { eventId: session.id, value: (session.amount_total || 0) / 100, currency: (session.currency || "usd").toUpperCase() }, siteOrigin(req))]);
+  if (autoEnabled()) waitUntil(produceOrder(order.id, siteOrigin(req))); // canción en segundo plano; Luz la aprueba antes de enviarla
   return json({ ok: true });
 }

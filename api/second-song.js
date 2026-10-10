@@ -1,6 +1,8 @@
 // POST /api/second-song — el cliente que compró la 2ª canción (upsell) envía la historia de la otra persona.
 // Body: lo mismo que /api/checkout + { prepaid: "<id del pedido original>.<token>" }
-import { json, loadOrder, saveOrder, newOrderId, cleanOrder, orderProblem, deliveryDate } from "./_lib.js";
+import { json, loadOrder, saveOrder, newOrderId, cleanOrder, orderProblem, deliveryDate, siteOrigin } from "./_lib.js";
+import { waitUntil } from "@vercel/functions";
+import { autoEnabled, produceOrder } from "./_produce.js";
 import { notifyOwner, confirmCustomer } from "./_emails.js";
 
 export async function POST(req) {
@@ -25,5 +27,6 @@ export async function POST(req) {
   main.song2Used = order.id;
   await saveOrder(main);
   await Promise.all([notifyOwner(order), confirmCustomer(order)]);
+  if (autoEnabled()) waitUntil(produceOrder(order.id, siteOrigin(req)));
   return json({ ok: true, readyBy: order.readyBy });
 }

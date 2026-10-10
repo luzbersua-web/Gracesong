@@ -1,1 +1,14 @@
-{ "cleanUrls": true }
+{
+  "cleanUrls": true,
+  "functions": {
+    "api/stripe-webhook.js": {
+      "maxDuration": 300
+    },
+    "api/second-song.js": {
+      "maxDuration": 300
+    },
+    "api/approve.js": {
+      "maxDuration": 300
+    }
+  }
+}
