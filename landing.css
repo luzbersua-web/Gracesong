@@ -140,3 +140,5 @@ h2{font-family:var(--serif);font-size:27px;line-height:1.25;color:var(--navy);ma
 .react p{font-size:15px;line-height:1.55;color:var(--muted);margin-bottom:14px}
 .react-link{color:var(--navy);font-weight:600;text-decoration:underline}
 .faq details p a{color:var(--gold-dark)}
+.hero-listen{display:block;text-align:center;margin-top:12px;color:var(--gold-dark);font-weight:600;font-size:15px;text-decoration:none}
+.hero-listen:hover{text-decoration:underline}
