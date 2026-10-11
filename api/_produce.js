@@ -61,7 +61,7 @@ export async function generateLyrics(order) {
   const text = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
   const sections = parseLyrics(text);
   const lineCount = sections.reduce((n, s) => n + s.lines.length, 0);
-  if (sections.length < 4 || lineCount < 14) throw new Error("La letra generada es demasiado corta o sin estructura");
+  if (sections.length < 6 || lineCount < 26) throw new Error("La letra generada es demasiado corta o sin estructura");
   return { text, sections };
 }
 
@@ -77,7 +77,7 @@ export function buildPlan(order, sections) {
     negative_global_styles: negative,
     sections: sections.map((s) => ({
       section_name: s.name,
-      duration_ms: Math.min(32000, Math.max(20000, s.lines.length * 6500)),
+      duration_ms: Math.min(40000, Math.max(14000, s.lines.length * 6500)),
       positive_local_styles: [],
       negative_local_styles: [],
       lines: s.lines,

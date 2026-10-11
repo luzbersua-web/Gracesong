@@ -81,18 +81,18 @@ export function orderProblem(o) {
 
 // ---------- textos para producir la canción ----------
 const GENRE_STYLE = {
-  worship: "acoustic worship, soft piano, prayerful",
-  "country-gospel": "country gospel, acoustic guitar, warm",
-  contemporary: "contemporary christian, piano and strings, radio ballad",
-  gospel: "gospel choir, soulful, uplifting",
-  ballad: "piano ballad, intimate, emotional",
-  acoustic: "acoustic folk, gentle guitar, heartfelt",
+  worship: "contemporary christian worship, cinematic piano, soft acoustic guitar, gentle strings, prayerful, building intensity",
+  "country-gospel": "country gospel, acoustic guitar, warm, heartfelt, congregational chorus",
+  contemporary: "contemporary christian worship, cinematic piano, acoustic guitar, gentle strings, building intensity, congregational chorus, similar to Phil Wickham and Chris Tomlin",
+  gospel: "gospel choir, soulful, uplifting, building intensity",
+  ballad: "piano ballad, cinematic strings, intimate, emotional, building intensity",
+  acoustic: "acoustic folk, gentle guitar, heartfelt, warm and hopeful",
 };
-const VOICE_STYLE = { female: "female vocals", male: "male vocals, warm baritone", duet: "male and female duet vocals" };
+const VOICE_STYLE = { female: "powerful emotional female vocals, clear diction", male: "powerful male vocals, warm baritone, clear diction", duet: "male and female duet vocals, clear diction" };
 const MOOD_STYLE = { tender: "tender, emotional", uplifting: "uplifting, hopeful", joyful: "joyful, celebratory" };
 
 export function musicStyle(o) {
-  return [GENRE_STYLE[o.genre], VOICE_STYLE[o.voice], MOOD_STYLE[o.mood], "radio quality"].filter(Boolean).join(", ");
+  return [GENRE_STYLE[o.genre], VOICE_STYLE[o.voice], MOOD_STYLE[o.mood], "faith-centered lyrics, professional studio production, radio quality"].filter(Boolean).join(", ");
 }
 
 export function recipientLabel(o) {
@@ -118,9 +118,12 @@ MOOD: ${o.mood}
 RULES:
 - Use the name in the chorus at least twice, naturally${o.relation === "myself" ? " (for a song to oneself, use 'I'/'me' instead of a name)" : ""}
 - Every line must feel like it could ONLY be about this person; use the concrete details above
-- Structure with labels on their own lines: [Verse 1] [Chorus] [Verse 2] [Chorus] [Bridge] [Chorus]
+- Structure with labels on their own lines: [Verse 1] [Pre-Chorus] [Chorus] [Verse 2] [Pre-Chorus] [Chorus] [Bridge] [Final Chorus]
+- Every detail above must appear in the song. If a detail contains a phrase in quotes, a catchphrase or words in Spanish, sing it EXACTLY as written (do not translate it), woven into the story and again in the Final Chorus or last line
+- Name the real places, dates and events from the story; no generic filler
+- Verses and Bridge: 4 lines each. Pre-Chorus: 2 lines. Chorus and Final Chorus: 4 lines each. About 32-38 lines in total
+- Keep every line short and singable (about 6-12 words) so it can be sung clearly without rushing
 - Faith should feel warm and natural, never preachy
-- 20-26 lines of lyrics total
 - Output ONLY the lyrics with section labels.`;
 }
 
