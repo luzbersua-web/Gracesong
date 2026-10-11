@@ -50,12 +50,14 @@ export async function generateLyrics(order) {
     headers: { "x-api-key": process.env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
     body: JSON.stringify({
       model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
-      max_tokens: 1500,
+      max_tokens: 4000,
       messages: [{ role: "user", content: lyricPrompt(order) }],
     }),
   });
   if (!r.ok) throw new Error(`Anthropic ${r.status}: ${(await r.text()).slice(0, 300)}`);
   const data = await r.json();
+  // Si la respuesta se cortó por límite de tokens, la letra queda incompleta: mejor fallar que mandar media canción.
+  if (data.stop_reason === "max_tokens") throw new Error("La letra se cortó por límite de tokens (stop_reason=max_tokens)");
   const text = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
   const sections = parseLyrics(text);
   const lineCount = sections.reduce((n, s) => n + s.lines.length, 0);
