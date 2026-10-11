@@ -83,7 +83,7 @@ export function orderProblem(o) {
 const GENRE_STYLE = {
   worship: "contemporary christian worship, cinematic piano, soft acoustic guitar, gentle strings, prayerful, building intensity",
   "country-gospel": "country gospel, acoustic guitar, warm, heartfelt, congregational chorus",
-  contemporary: "contemporary christian worship, cinematic piano, acoustic guitar, gentle strings, building intensity, congregational chorus, similar to Phil Wickham and Chris Tomlin",
+  contemporary: "contemporary inspirational ballad, cinematic piano, acoustic guitar, gentle strings, building intensity, anthemic chorus, emotional",
   gospel: "gospel choir, soulful, uplifting, building intensity",
   ballad: "piano ballad, cinematic strings, intimate, emotional, building intensity",
   acoustic: "acoustic folk, gentle guitar, heartfelt, warm and hopeful",
@@ -92,7 +92,7 @@ const VOICE_STYLE = { female: "powerful emotional female vocals, clear diction",
 const MOOD_STYLE = { tender: "tender, emotional", uplifting: "uplifting, hopeful", joyful: "joyful, celebratory" };
 
 export function musicStyle(o) {
-  return [GENRE_STYLE[o.genre], VOICE_STYLE[o.voice], MOOD_STYLE[o.mood], "faith-centered lyrics, professional studio production, radio quality"].filter(Boolean).join(", ");
+  return [GENRE_STYLE[o.genre], VOICE_STYLE[o.voice], MOOD_STYLE[o.mood], `${o.verse && o.verse !== "none" ? "faith-centered lyrics, " : ""}professional studio production, radio quality`].filter(Boolean).join(", ");
 }
 
 export function recipientLabel(o) {
@@ -101,7 +101,7 @@ export function recipientLabel(o) {
 
 // Instrucción para escribir la letra (se usará con la API de Claude en la etapa 2; mientras, va en el email)
 export function lyricPrompt(o) {
-  return `You are a professional Christian songwriter. Write a complete, deeply personal song using ONLY these real details.
+  return `You are a professional songwriter of heartfelt, inspirational songs. Write a complete, deeply personal song using ONLY these real details.
 
 FOR: ${recipientLabel(o)} — relationship to buyer: ${o.relation}${o.pronoun ? ` (refer to them as ${o.pronoun})` : ""}
 FROM: ${o.buyerName}
@@ -110,8 +110,8 @@ SONG TITLE: ${o.title || ""}
 QUALITIES: ${[...(o.qualities || []), o.traits].filter(Boolean).join("; ")}
 STORY & MEMORIES: ${o.story}
 OTHER NAMES TO INCLUDE: ${o.otherNames || "none"}
-BIBLE VERSE TO WEAVE IN: ${o.verse && o.verse !== "none" ? o.verse : "your choice, subtle"}
-WHAT THEY THANK GOD FOR: ${o.thanks || "—"}
+BIBLE VERSE TO WEAVE IN: ${o.verse && o.verse !== "none" ? o.verse : "none"}
+WHAT THEY ARE THANKFUL FOR: ${o.thanks || "—"}
 FINAL LINE (end the song with this idea): ${o.message}
 MOOD: ${o.mood}
 
@@ -123,7 +123,7 @@ RULES:
 - Name the real places, dates and events from the story; no generic filler
 - Verses and Bridge: 4 lines each. Pre-Chorus: 2 lines. Chorus and Final Chorus: 4 lines each. About 32-38 lines in total
 - Keep every line short and singable (about 6-12 words) so it can be sung clearly without rushing
-- Faith should feel warm and natural, never preachy
+- Faith: if a Bible verse is given, or the details above mention God, prayer or church, weave that in warmly and naturally, never preachy. If none of that appears, do NOT add Bible verses, prayers or religious language; keep it universal, warm and emotional
 - Output ONLY the lyrics with section labels.`;
 }
 

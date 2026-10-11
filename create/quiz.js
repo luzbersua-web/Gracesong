@@ -30,14 +30,14 @@ const OCCASIONS = [
   { v: "fathers-day", t: "Father's Day", ico: "👔" },
   { v: "christmas", t: "Christmas", ico: "🎄" },
   { v: "memorial", t: "In loving memory", ico: "🕯️" },
-  { v: "healing", t: "Healing & strength", ico: "✝️" },
+  { v: "healing", t: "Healing & strength", ico: "🌅" },
   { v: "just-because", t: "Just because", ico: "💌" },
 ];
 
 const GENRES = [
   { v: "worship", t: "Worship", d: "Soft, prayerful, like Sunday morning" },
   { v: "country-gospel", t: "Country Gospel", d: "Acoustic guitar, warm & honest" },
-  { v: "contemporary", t: "Contemporary Christian", d: "Radio-style, piano & strings" },
+  { v: "contemporary", t: "Contemporary", d: "Radio-style, piano & strings" },
   { v: "gospel", t: "Gospel Choir", d: "Big, joyful, full of soul" },
   { v: "ballad", t: "Piano Ballad", d: "Tender, intimate, emotional" },
   { v: "acoustic", t: "Acoustic Folk", d: "Simple, gentle, heartfelt" },
@@ -51,7 +51,7 @@ const SPARKS = [
   { t: "The hardest season", s: "When we went through the hardest season, " },
   { t: "A little habit I love", s: "Every day, you have this little habit: " },
   { t: "Something only we say", s: "We always say to each other: " },
-  { t: "When I saw God in you", s: "I saw God's love in you when " },
+  { t: "When I saw your heart", s: "I saw how special you are when " },
   { t: "A favorite place", s: "Our favorite place is " },
 ];
 
@@ -68,7 +68,7 @@ const VERSES = [
 
 // ---------- estado ----------
 let data = load() || { qualities: [], step: 0 };
-let step = Math.min(data.step || 0, 6);
+let step = Math.min(data.step || 0, 3); // nunca saltar directo al plano ni al pago al reabrir
 
 function load() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY)); } catch { return null; }
@@ -102,7 +102,9 @@ function fmtDate(iso) {
 
 function songTitles() {
   const n = name();
-  const byRel = {
+  // Con versículo elegido, títulos con fe; sin versículo, títulos neutros.
+  const faith = !!data.wantVerse;
+  const byRel = faith ? {
     wife: [`${n}, You Are My Grace`, `The Answer to My Prayers`, `Every Road Led Me to You`],
     husband: [`${n}, My Covering`, `The Man God Sent Me`, `Every Road Led Me to You`],
     partner: [`${n}, You Are My Grace`, `The Answer to My Prayers`, `Every Road Led Me to You`],
@@ -115,13 +117,27 @@ function songTitles() {
     friend: [`${n}, Sent by God`, `A Friend Like You`, `Heaven Knew I'd Need You`],
     heaven: [`See You in Glory, ${n}`, `${n}, Safe in His Arms`, `Until We Meet Again`],
     myself: [`Still Standing by His Grace`, `He Carried Me`, `My Breakthrough Song`],
+  } : {
+    wife: [`${n}, You Are My Home`, `The Answer to My Heart`, `Every Road Led Me to You`],
+    husband: [`${n}, My Safe Place`, `The Man Who Held My Heart`, `Every Road Led Me to You`],
+    partner: [`${n}, You Are My Home`, `The Answer to My Heart`, `Every Road Led Me to You`],
+    mom: [`Mama, You Showed Me Love`, `${n}'s Hands`, `She Carried Me Through`],
+    dad: [`Daddy, You Showed Me How`, `${n}'s Hands`, `He Carried Me Through`],
+    daughter: [`${n}, My Greatest Gift`, `Little Light of Mine`, `Your Name Is My Favorite Song`],
+    son: [`${n}, My Greatest Gift`, `My Boy, My Heart`, `Your Name Is My Favorite Song`],
+    grandma: [`Grandma's Porch Memories`, `${n}, Our Foundation`, `A Legacy of Love`],
+    grandpa: [`Grandpa's Quiet Strength`, `${n}, Our Foundation`, `A Legacy of Love`],
+    friend: [`${n}, My Friend Forever`, `A Friend Like You`, `Life Is Better With You`],
+    heaven: [`See You Again, ${n}`, `${n}, Forever in My Heart`, `Until We Meet Again`],
+    myself: [`Still Standing`, `Look How Far I've Come`, `My Breakthrough Song`],
   };
   return byRel[data.relation] || [`${n}, You Are My Grace`, `A Song for ${n}`, `Grace Found Me Through You`];
 }
 
 // ---------- pantallas ----------
 // render() devuelve el HTML; bind() conecta eventos; valid() devuelve un mensaje de error o null.
-const SCREENS = [
+// ALL = pantallas individuales; más abajo se combinan en SCREENS (menos pasos para el cliente).
+const ALL = [
   {
     hint: "About 3 minutes",
     render: () => `
@@ -256,7 +272,7 @@ const SCREENS = [
     hint: "Your story",
     render: () => `
       <div class="eyebrow">Your story</div>
-      <h1 class="q">${data.relation === "myself" ? "What has God brought you through?" : `Share a few memories with ${esc(name())}`}</h1>
+      <h1 class="q">${data.relation === "myself" ? "What have you walked through?" : `Share a few memories with ${esc(name())}`}</h1>
       <p class="sub">The more real details you share, the more the song will sound like <i>your</i> story. Tap an idea to get started.</p>
       <div class="sparks">${SPARKS.map((s, i) => `<button type="button" class="spark" data-spark="${i}">+ ${s.t}</button>`).join("")}</div>
       <textarea id="f-story" maxlength="2000" style="min-height:170px" placeholder="Names, places, dates, inside jokes, hard seasons you walked through together…">${esc(data.story)}</textarea>
@@ -286,28 +302,41 @@ const SCREENS = [
   },
   {
     hint: "Faith",
-    render: () => `
-      <div class="eyebrow">Faith</div>
-      <h1 class="q">Is there a verse that speaks to ${data.relation === "myself" ? "you" : "your story"}?</h1>
-      <p class="sub">We'll weave it gently into the lyrics.</p>
-      <div class="block"><div class="chips">${VERSES.map((v) =>
-        `<button type="button" class="chip ${data.verse === v.v ? "on" : ""}" data-verse="${esc(v.v)}">${esc(v.t)}</button>`).join("")}
-        <button type="button" class="chip ${data.verse === "none" ? "on" : ""}" data-verse="none">Surprise me</button></div>
-        <input type="text" id="f-verse" maxlength="80" style="margin-top:10px" placeholder="Or type another verse or hymn…" value="${esc(VERSES.some((v) => v.v === data.verse) || data.verse === "none" ? "" : data.verse)}">
+    render: () => {
+      const want = !!data.wantVerse;
+      return `
+      <div class="eyebrow">A special touch</div>
+      <h1 class="q">Would you like a Bible verse in ${data.relation === "myself" ? "your" : esc(name()) + "'s"} song?</h1>
+      <p class="sub">Totally optional — the song can simply be about your story.</p>
+      <div class="block"><div class="chips">
+        <button type="button" class="chip ${want ? "on" : ""}" data-want="yes">Yes, add a verse</button>
+        <button type="button" class="chip ${want ? "" : "on"}" data-want="no">No, just our story</button></div></div>
+      <div class="block" id="verse-block" ${want ? "" : "hidden"}>
+        <div class="chips">${VERSES.map((v) =>
+        `<button type="button" class="chip ${data.verse === v.v ? "on" : ""}" data-verse="${esc(v.v)}">${esc(v.t)}</button>`).join("")}</div>
+        <input type="text" id="f-verse" maxlength="80" style="margin-top:10px" placeholder="Or type another verse…" value="${esc(VERSES.some((v) => v.v === data.verse) ? "" : data.verse && data.verse !== "none" ? data.verse : "")}">
       </div>
       <div class="block">
-        <label class="label" for="f-thanks">${data.relation === "myself" ? "What are you most thankful to God for?" : `What do you thank God for about ${esc(name())}?`} <span class="opt">(optional)</span></label>
-        <textarea id="f-thanks" maxlength="600" placeholder="e.g. I thank God she never gave up on me.">${esc(data.thanks)}</textarea>
-      </div>`,
+        <label class="label" for="f-thanks">${data.relation === "myself" ? "What are you most thankful for?" : `What are you most thankful for about ${esc(name())}?`} <span class="opt">(optional)</span></label>
+        <textarea id="f-thanks" maxlength="600" placeholder="e.g. I'm thankful she never gave up on me.">${esc(data.thanks)}</textarea>
+      </div>`;
+    },
     bind: (root) => {
       const input = $("#f-verse");
+      root.querySelectorAll("[data-want]").forEach((b) => b.onclick = () => {
+        data.wantVerse = b.dataset.want === "yes";
+        if (!data.wantVerse) { data.verse = ""; input.value = ""; root.querySelectorAll("[data-verse]").forEach((x) => x.classList.remove("on")); }
+        root.querySelectorAll("[data-want]").forEach((x) => x.classList.toggle("on", x === b));
+        $("#verse-block").hidden = !data.wantVerse;
+        save();
+      });
       root.querySelectorAll("[data-verse]").forEach((b) => b.onclick = () => {
         data.verse = b.dataset.verse; input.value = "";
         root.querySelectorAll("[data-verse]").forEach((x) => x.classList.toggle("on", x === b));
         save();
       });
       input.oninput = () => {
-        data.verse = input.value.trim() || null;
+        data.verse = input.value.trim();
         root.querySelectorAll("[data-verse]").forEach((x) => x.classList.remove("on"));
         save();
       };
@@ -470,6 +499,50 @@ const SCREENS = [
   },
 ];
 
+// ---------- combinar pantallas: 9 pasos → 6 ----------
+// La segunda pantalla se muestra como sección (sin eyebrow ni subtítulo) debajo de la primera.
+const section = (html) => html.replace(/<div class="eyebrow">[\s\S]*?<\/div>\s*<h1 class="q">([\s\S]*?)<\/h1>\s*<p class="sub">[\s\S]*?<\/p>/, '<h2 class="q q-sec">$1</h2>');
+function merge(hint, a, b) {
+  return {
+    hint,
+    render: () => a.render() + `<div class="merged-sec">${section(b.render())}</div>`,
+    bind: (root) => { a.bind(root); b.bind(root); },
+    valid: () => a.valid() || b.valid(),
+    next: a.next || b.next,
+  };
+}
+const [S_WHO, S_OCC, S_SOUND, , S_STORY, S_FAITH, S_MSG, S_PLAN, S_PAY] = ALL;
+
+// Estilo con valores por defecto (Contemporary + Tender): el cliente solo elige la voz.
+const SOUND = { ...S_SOUND, render: () => { data.genre = data.genre || "contemporary"; data.mood = data.mood || "tender"; return S_SOUND.render(); } };
+
+// Palabras que describen a la persona: ahora opcionales y dentro de la pantalla de la historia.
+const WORDS = {
+  render: () => `<div class="block">
+      <span class="label">${data.relation === "myself" ? "Words that describe you" : `Words that describe ${esc(name())}`} <span class="opt">(optional — up to 5)</span></span>
+      <div class="chips">${QUALITIES.map((q) => `<button type="button" class="chip ${data.qualities.includes(q) ? "on" : ""}" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div></div>`,
+  bind: (root) => {
+    root.querySelectorAll("[data-q]").forEach((b) => b.onclick = () => {
+      const q = b.dataset.q, i = data.qualities.indexOf(q);
+      if (i >= 0) data.qualities.splice(i, 1);
+      else if (data.qualities.length < 5) data.qualities.push(q);
+      b.classList.toggle("on", data.qualities.includes(q));
+      save();
+    });
+  },
+  valid: () => null,
+};
+const STORY = { ...S_STORY, render: () => S_STORY.render() + `<div class="block" style="margin-top:18px">${WORDS.render()}</div>`, bind: (root) => { S_STORY.bind(root); WORDS.bind(root); } };
+
+const SCREENS = [
+  { ...merge("About 2 minutes", S_WHO, S_OCC), hint: "About 2 minutes" },
+  SOUND,
+  { ...STORY, hint: "Your story" },
+  merge("From your heart", S_MSG, S_FAITH),
+  S_PLAN,
+  S_PAY,
+];
+
 function firstSentence(s) {
   const t = (s || "").trim().split(/(?<=[.!?])\s|\n/)[0] || "";
   return t ? `“${truncate(t, 120)}”` : null;
@@ -515,7 +588,7 @@ function pickOne(root, key) {
 
 // ---------- navegación ----------
 const app = $("#app"), btnNext = $("#btn-next"), btnBack = $("#btn-back");
-const COMPOSE_AT = 7; // antes del plano de la canción mostramos la animación "componiendo"
+const COMPOSE_AT = 4; // antes del plano de la canción mostramos la animación "componiendo"
 
 function render() {
   const s = SCREENS[step];
