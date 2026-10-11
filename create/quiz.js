@@ -384,8 +384,8 @@ const ALL = [
         `<button type="button" class="title-opt ${data.title === t ? "on" : ""}" data-title="${esc(t)}">${esc(t)}</button>`).join("")}</div></div>
       <div class="sample">
         <button type="button" class="sample-play" id="sample-play" aria-label="Play sample">▶</button>
-        <div><div class="sample-t">Hear a sample: “Brenda, You Are My Grace”</div><div class="sample-d">An example of a GraceSong made from a story like yours</div></div>
-        <audio id="sample-audio" src="/samples/brenda-you-are-my-grace.mp3" preload="none"></audio>
+        <div><div class="sample-t">Hear a sample GraceSong</div><div class="sample-d">An example of a GraceSong made from a story like yours</div></div>
+        <audio id="sample-audio" src="/samples/daniel-sample.mp3" preload="none"></audio>
       </div>`;
     },
     bind: (root) => {
