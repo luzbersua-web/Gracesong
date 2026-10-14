@@ -68,6 +68,16 @@ export async function generateLyrics(order) {
 // ---------- música ----------
 const NEGATIVE = ["rap", "electronic", "distorted", "shouting"];
 
+// Estilo por sección: versos íntimos, coro grande y memorable, puente que sube, coro final el más potente.
+function localStyles(name) {
+  const n = name.toLowerCase();
+  if (n.includes("final")) return { pos: ["biggest chorus of the song", "full band", "powerful drums", "soaring layered vocals", "key lift", "emotional climax"], neg: ["quiet", "sparse"] };
+  if (n.includes("pre")) return { pos: ["building tension", "rising strings", "drums begin to enter"], neg: [] };
+  if (n.includes("chorus")) return { pos: ["big anthemic chorus", "singable memorable hook", "full band with drums", "soaring layered vocals", "wide and uplifting"], neg: ["sparse", "quiet"] };
+  if (n.includes("bridge")) return { pos: ["stripped back", "intimate", "then slowly building", "emotional"], neg: ["full band at start"] };
+  return { pos: ["intimate", "sparse piano and soft guitar", "gentle storytelling vocal", "restrained"], neg: ["big drums", "loud"] };
+}
+
 export function buildPlan(order, sections) {
   const male = order.voice === "male";
   const female = order.voice === "female";
@@ -75,13 +85,17 @@ export function buildPlan(order, sections) {
   return {
     positive_global_styles: musicStyle(order).split(",").map((s) => s.trim()).filter(Boolean),
     negative_global_styles: negative,
-    sections: sections.map((s) => ({
-      section_name: s.name,
-      duration_ms: Math.min(40000, Math.max(14000, s.lines.length * 6500)),
-      positive_local_styles: [],
-      negative_local_styles: [],
-      lines: s.lines,
-    })),
+    // ~5 s por línea: la canción queda en unos 2:45 en vez de más de 3:30.
+    sections: sections.map((s) => {
+      const st = localStyles(s.name);
+      return {
+        section_name: s.name,
+        duration_ms: Math.min(30000, Math.max(12000, s.lines.length * 5000)),
+        positive_local_styles: st.pos,
+        negative_local_styles: st.neg,
+        lines: s.lines,
+      };
+    }),
   };
 }
 
