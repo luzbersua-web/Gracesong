@@ -24,7 +24,10 @@ async function view(order, id, t) {
     ${["awaiting_approval", "delivered"].includes(order.status) ? `<form method="post">
       <input type="hidden" name="id" value="${id}"><input type="hidden" name="t" value="${esc(t)}">
       <button class="ok" name="action" value="approve">✅ ${order.status === "delivered" ? "Reenviar al cliente" : "Aprobar y enviar al cliente"}</button>
-      <button class="redo" name="action" value="redo">🔄 Hacer otra versión</button></form>
+      <button class="redo" name="action" value="redo">🔄 Hacer otra versión (letra y música nuevas)</button>
+      <h3>Editar la letra</h3>
+      <textarea name="lyrics" rows="16" style="width:100%;box-sizing:border-box;font-family:Georgia,serif;font-size:15px;padding:10px;border-radius:10px;border:1px solid #ccc">${esc(order.lyrics || "")}</textarea>
+      <button class="redo" name="action" value="redo_same">🎼 Misma letra (con mis cambios), otra música</button></form>
       <p class="muted">Al aprobar, el cliente recibe un enlace privado para escuchar y descargar su canción.</p>` : `<p>⏳ La canción se está produciendo o falló; mira tu correo. Si pasaron más de 10 minutos desde el pago, se trabó: reintenta.</p>
     <form method="post"><input type="hidden" name="id" value="${id}"><input type="hidden" name="t" value="${esc(t)}">
       <button class="redo" name="action" value="redo">🔄 Reintentar producción</button></form>`}`);
@@ -50,6 +53,12 @@ export async function POST(req) {
   if (action === "redo") {
     waitUntil(produceOrder(id, origin));
     return page(`<h1>🔄 Haciendo otra versión</h1><p>Te llegará un correo nuevo cuando esté lista (unos minutos). El cliente no ha recibido nada.</p>`);
+  }
+  if (action === "redo_same") {
+    const lyrics = String(form.get("lyrics") || "").slice(0, 6000);
+    if (lyrics.trim().length < 200) return page("<h1>La letra está vacía o es muy corta</h1>", 400);
+    waitUntil(produceOrder(id, origin, { lyrics }));
+    return page(`<h1>🎼 Rehaciendo la música</h1><p>Se conserva la letra (con tus cambios) y se hace otra música. Te llegará un correo nuevo en unos minutos. El cliente no ha recibido nada.</p>`);
   }
   if (action === "approve") {
     if (!["awaiting_approval", "delivered"].includes(order.status)) return page("<h1>Esta canción aún no está lista</h1>", 409);

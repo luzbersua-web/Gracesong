@@ -78,6 +78,16 @@ function localStyles(name) {
   return { pos: ["intimate", "sparse piano and soft guitar", "gentle storytelling vocal", "restrained"], neg: ["big drums", "loud"] };
 }
 
+// Dúo: él canta los versos, ella entra con armonías en el pre-coro, los coros son de los dos y el coro final cierra a dos voces.
+function duetStyles(name) {
+  const n = name.toLowerCase();
+  if (n.includes("final")) return { pos: ["male and female duet singing together", "female voice leads with male harmony", "stacked duet harmonies"], neg: ["solo male voice", "male only"] };
+  if (n.includes("pre")) return { pos: ["female voice joins softly with the male lead", "duet harmonies"], neg: [] };
+  if (n.includes("chorus")) return { pos: ["male and female duet singing together", "alternating male and female lines", "both voices in harmony"], neg: ["solo male voice", "male only"] };
+  if (n.includes("bridge")) return { pos: ["female voice sings alone", "tender"], neg: ["male voice"] };
+  return { pos: ["male lead vocal"], neg: ["female vocals"] };
+}
+
 export function buildPlan(order, sections) {
   const male = order.voice === "male";
   const female = order.voice === "female";
@@ -88,6 +98,7 @@ export function buildPlan(order, sections) {
     // ~5 s por línea: la canción queda en unos 2:45 en vez de más de 3:30.
     sections: sections.map((s, i) => {
       const st = localStyles(s.name);
+      if (order.voice === "duet") { const d = duetStyles(s.name); st.pos = [...st.pos, ...d.pos]; st.neg = [...st.neg, ...d.neg]; }
       const last = i === sections.length - 1; // la última sección (coro final) nunca debe quedar corta ni sin cantar
       return {
         section_name: s.name,
@@ -112,7 +123,8 @@ export async function composeSong(order, sections) {
 
 // ---------- flujo completo ----------
 // Se llama con waitUntil() desde el webhook (el pago responde rápido; la canción se hace en segundo plano).
-export async function produceOrder(orderId, origin) {
+// opts.lyrics: letra ya escrita (se conserva y solo se rehace la música).
+export async function produceOrder(orderId, origin, opts = {}) {
   let order;
   try {
     order = await loadOrder(orderId);
@@ -122,7 +134,15 @@ export async function produceOrder(orderId, origin) {
     order.attempts = (order.attempts || 0) + 1;
     await saveOrder(order);
 
-    const lyrics = await generateLyrics(order);
+    let lyrics;
+    if (opts.lyrics) {
+      const text = String(opts.lyrics).replace(/\r/g, "").trim();
+      const sections = parseLyrics(text);
+      if (sections.length < 3) throw new Error("La letra editada no tiene estructura ([Verse 1], [Chorus]…)");
+      lyrics = { text, sections };
+    } else {
+      lyrics = await generateLyrics(order);
+    }
     // Si ElevenLabs se come secciones (p. ej. el coro final), el mp3 queda mucho más corto que el plan: se rehace una vez.
     const expectedSec = buildPlan(order, lyrics.sections).sections.reduce((n, s) => n + s.duration_ms, 0) / 1000;
     let audio = await composeSong(order, lyrics.sections);
