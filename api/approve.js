@@ -25,7 +25,9 @@ async function view(order, id, t) {
       <input type="hidden" name="id" value="${id}"><input type="hidden" name="t" value="${esc(t)}">
       <button class="ok" name="action" value="approve">✅ ${order.status === "delivered" ? "Reenviar al cliente" : "Aprobar y enviar al cliente"}</button>
       <button class="redo" name="action" value="redo">🔄 Hacer otra versión</button></form>
-      <p class="muted">Al aprobar, el cliente recibe un enlace privado para escuchar y descargar su canción.</p>` : `<p>⏳ La canción se está produciendo o falló; mira tu correo.</p>`}`);
+      <p class="muted">Al aprobar, el cliente recibe un enlace privado para escuchar y descargar su canción.</p>` : `<p>⏳ La canción se está produciendo o falló; mira tu correo. Si pasaron más de 10 minutos desde el pago, se trabó: reintenta.</p>
+    <form method="post"><input type="hidden" name="id" value="${id}"><input type="hidden" name="t" value="${esc(t)}">
+      <button class="redo" name="action" value="redo">🔄 Reintentar producción</button></form>`}`);
 }
 
 export async function GET(req) {
