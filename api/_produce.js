@@ -130,7 +130,10 @@ export async function produceOrder(orderId, origin, opts = {}) {
     order = await loadOrder(orderId);
     if (!order) throw new Error("Pedido no encontrado");
     if (order.status === "delivered") return;
+    // Si ya hay una producción en curso (empezó hace menos de 8 min), no lanzar otra encima.
+    if (order.status === "producing" && order.producingSince && Date.now() - Date.parse(order.producingSince) < 8 * 60 * 1000) return;
     order.status = "producing";
+    order.producingSince = new Date().toISOString();
     order.attempts = (order.attempts || 0) + 1;
     await saveOrder(order);
 

@@ -30,7 +30,8 @@ async function view(order, id, t) {
       <button class="redo" name="action" value="redo_same">🎼 Misma letra (con mis cambios), otra música</button></form>
       <p class="muted">Al aprobar, el cliente recibe un enlace privado para escuchar y descargar su canción.</p>` : `<p>⏳ La canción se está produciendo o falló; mira tu correo. Si pasaron más de 10 minutos desde el pago, se trabó: reintenta.</p>
     <form method="post"><input type="hidden" name="id" value="${id}"><input type="hidden" name="t" value="${esc(t)}">
-      <button class="redo" name="action" value="redo">🔄 Reintentar producción</button></form>`}`);
+      <button class="redo" name="action" value="${order.lyrics ? "redo_same" : "redo"}">🔄 Reintentar producción${order.lyrics ? " (misma letra)" : ""}</button>
+      ${order.lyrics ? `<input type="hidden" name="lyrics" value="${esc(order.lyrics)}">` : ""}</form>`}`);
 }
 
 export async function GET(req) {
