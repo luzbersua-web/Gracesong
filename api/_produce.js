@@ -71,9 +71,9 @@ const NEGATIVE = ["rap", "electronic", "distorted", "shouting"];
 // Estilo por sección: versos íntimos, coro grande y memorable, puente que sube, coro final el más potente.
 function localStyles(name) {
   const n = name.toLowerCase();
-  if (n.includes("final")) return { pos: ["biggest chorus of the song", "full band", "powerful drums", "soaring layered vocals", "key lift", "emotional climax"], neg: ["quiet", "sparse"] };
+  if (n.includes("final")) return { pos: ["biggest chorus of the song", "full band", "powerful drums", "electric guitars", "bass", "lush strings", "soaring layered vocals", "stacked harmonies", "backing choir", "key lift", "emotional climax"], neg: ["quiet", "sparse", "solo voice", "piano only"] };
   if (n.includes("pre")) return { pos: ["building tension", "rising strings", "drums begin to enter"], neg: [] };
-  if (n.includes("chorus")) return { pos: ["big anthemic chorus", "singable memorable hook", "full band with drums", "soaring layered vocals", "wide and uplifting"], neg: ["sparse", "quiet"] };
+  if (n.includes("chorus")) return { pos: ["big anthemic chorus", "singable memorable hook", "full band", "powerful drums", "electric guitars", "bass", "lush strings", "soaring layered vocals", "stacked harmonies", "backing vocals", "wide and uplifting"], neg: ["sparse", "quiet", "solo voice", "piano only"] };
   if (n.includes("bridge")) return { pos: ["stripped back", "intimate", "then slowly building", "emotional"], neg: ["full band at start"] };
   return { pos: ["intimate", "sparse piano and soft guitar", "gentle storytelling vocal", "restrained"], neg: ["big drums", "loud"] };
 }
@@ -86,11 +86,12 @@ export function buildPlan(order, sections) {
     positive_global_styles: musicStyle(order).split(",").map((s) => s.trim()).filter(Boolean),
     negative_global_styles: negative,
     // ~5 s por línea: la canción queda en unos 2:45 en vez de más de 3:30.
-    sections: sections.map((s) => {
+    sections: sections.map((s, i) => {
       const st = localStyles(s.name);
+      const last = i === sections.length - 1; // la última sección (coro final) nunca debe quedar corta ni sin cantar
       return {
         section_name: s.name,
-        duration_ms: Math.min(30000, Math.max(12000, s.lines.length * 5000)),
+        duration_ms: Math.min(last ? 34000 : 30000, Math.max(last ? 24000 : 12000, s.lines.length * (last ? 6000 : 5000))),
         positive_local_styles: st.pos,
         negative_local_styles: st.neg,
         lines: s.lines,
@@ -122,7 +123,10 @@ export async function produceOrder(orderId, origin) {
     await saveOrder(order);
 
     const lyrics = await generateLyrics(order);
-    const audio = await composeSong(order, lyrics.sections);
+    // Si ElevenLabs se come secciones (p. ej. el coro final), el mp3 queda mucho más corto que el plan: se rehace una vez.
+    const expectedSec = buildPlan(order, lyrics.sections).sections.reduce((n, s) => n + s.duration_ms, 0) / 1000;
+    let audio = await composeSong(order, lyrics.sections);
+    if (audio.length / 24000 < expectedSec * 0.85) audio = await composeSong(order, lyrics.sections); // 192 kbps ≈ 24 KB por segundo
     await put(songPath(order.id), audio, { access: BLOB_ACCESS, contentType: "audio/mpeg", addRandomSuffix: false, allowOverwrite: true });
 
     order = (await loadOrder(orderId)) || order;
