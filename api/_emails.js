@@ -52,7 +52,7 @@ export async function confirmCustomer(o) {
     <p style="font-size:15px;line-height:1.6;background:#FBF6EA;padding:14px;border-radius:10px">🎥 <b>A little idea:</b> when they hear it for the first time, press record. Send us their reaction and we'll gift you a free GraceSong for someone else you love.</p>
     <p style="font-size:15px;line-height:1.6">Want to add a detail or fix a name? Just reply to this email.</p>
     <p style="font-size:15px">With love,<br>The GraceSong team</p>
-    <p style="font-size:12px;color:#888;font-family:Arial,sans-serif">Order ${esc(o.id)} · 7-day “love it” guarantee</p>
+    <p style="font-size:12px;color:#888;font-family:Arial,sans-serif">Order ${esc(o.id)} · 30-day “love it” guarantee</p>
   </div>`;
   return sendEmail({ to: o.email, subject: `We're writing ${o.relation === "myself" ? "your" : `${o.name}'s`} GraceSong 🎵`, html, replyTo: NOTIFY_EMAIL });
 }
@@ -85,7 +85,7 @@ export async function confirmCustomerOffer(o, offer, link) {
     <p style="font-size:16px;line-height:1.6">Hi ${esc(o.buyerName)},</p>
     ${body}
     <p style="font-size:15px">With love,<br>The GraceSong team</p>
-    <p style="font-size:12px;color:#888;font-family:Arial,sans-serif">Order ${esc(o.id)} · ${esc(OFFERS[offer].name)} ${money(OFFERS[offer].cents)} · 7-day “love it” guarantee</p>
+    <p style="font-size:12px;color:#888;font-family:Arial,sans-serif">Order ${esc(o.id)} · ${esc(OFFERS[offer].name)} ${money(OFFERS[offer].cents)} · 30-day “love it” guarantee</p>
   </div>`;
   return sendEmail({ to: o.email, subject: offer === "song2" ? "Tell us who your second GraceSong is for 🎵" : "Your GraceSong lyric video is confirmed 🎬", html, replyTo: NOTIFY_EMAIL });
 }
@@ -103,7 +103,7 @@ export async function deliverSong(o, link) {
     <p style="font-size:15px;line-height:1.6;background:#FBF6EA;padding:14px;border-radius:10px">🎥 <b>When they hear it for the first time, press record.</b> Send us their reaction and we'll gift you a free GraceSong for someone else you love.</p>
     <p style="font-size:15px;line-height:1.6">Want a small change? Just reply to this email.</p>
     <p style="font-size:15px">With love,<br>The GraceSong team</p>
-    <p style="font-size:12px;color:#888;font-family:Arial,sans-serif">Order ${esc(o.id)} · 7-day “love it” guarantee</p>
+    <p style="font-size:12px;color:#888;font-family:Arial,sans-serif">Order ${esc(o.id)} · 30-day “love it” guarantee</p>
   </div>`;
   return sendEmail({ to: o.email, subject: `${who.charAt(0).toUpperCase() + who.slice(1)} GraceSong is ready 🎵`, html, replyTo: NOTIFY_EMAIL });
 }

@@ -448,7 +448,7 @@ const ALL = [
           ${[["romantic", "Romantic"], ["classic", "Classic"]].map(([v, t]) => `<button type="button" class="bump-opt${(data.bumpstyle || "romantic") === v ? " on" : ""}" data-bumpstyle="${v}"><img src="/assets/lyric-art-${v}.webp" alt="${t} style" width="240" height="300" loading="lazy"><span>${t}</span></button>`).join("")}
         </div>
       </div></div>`}
-      <div class="guarantee"><span style="font-size:26px">🛡️</span><div><b>7-day “love it” guarantee</b>If the song doesn't touch your heart, email us within 7 days of delivery and we'll refund you in full.</div></div>
+      <div class="guarantee"><span style="font-size:26px">🛡️</span><div><b>30-day “love it” guarantee</b>If the song doesn't touch your heart, email us within 30 days of delivery and we'll refund you in full.</div></div>
       <p class="fine">Our songwriters use modern AI-assisted music production tools to bring your lyrics to life. Secure payment by Stripe. By ordering you agree to our <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</p>`,
     bind: (root) => {
       bindText(root, "#f-buyer", "buyerName");
